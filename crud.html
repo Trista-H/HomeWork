@@ -1,0 +1,124 @@
+<!DOCTYPE html>
+<html lang="zh-TW">
+<head>
+<meta charset="UTF-8">
+<meta http-equiv="X-UA-Compatible" content="IE=edge">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>CRUD</title>
+<style>
+    body {
+        color: #666;
+        text-align: center;
+    }
+    ul {
+        margin: 0 auto 2em;
+        min-width: calc(300px - 2em);
+        padding: 0;
+        width: 50%;
+    }
+    li {
+        border-bottom: 1px dotted #ccc;
+        display: flex;
+        justify-content:space-between;
+        list-style: none;
+        margin-top: 1em;
+        padding-bottom: 1em;
+    }
+    button {
+        border: 0;
+        border-radius: 2px;
+        color: #fff;
+        padding: 5px 8px;
+        cursor: pointer;
+    }
+    #addBtn {
+        background-color: cadetblue;
+    }
+    .editBtn,
+    .saveBtn {
+        background-color: rgb(65, 122, 65);
+    }
+    .deleteBtn {
+        background-color: palevioletred;
+    }
+    .cancelBtn {
+        background-color: gray;
+    }
+</style>
+</head>
+<body>
+<p>CRUD<br />C = create, R = read, U = update, D = delete</p>
+<hr />
+<ul id="list"></ul>
+<button id="addBtn">Add one</button>
+<script>
+    const addBtn = document.querySelector('#addBtn')
+    let arr = [];
+    let editId = '';
+    const isEdit = (id, name) => {
+        if (editId === id) {
+            return `<input type="text" id="input${id}" value="${catchName}" />
+            <button id="save${id}" class="saveBtn">Save</button>
+            `
+        } else {
+            return name
+        }
+    }
+    let catchName = '';
+    const render = () => {
+        const wrapper = document.querySelector('#list');
+        //render
+        const model = arr.map((item) => {
+            return `<li>
+                <button id="${item.id}" class="deleteBtn">X</button> 
+                ${isEdit(item.id, item.name)}
+                <button id="edit${item.id}" class="editBtn">Edit</button>
+                </li>` 
+        }).join(' ');
+        wrapper.innerHTML = model;
+
+        //delete
+        arr.forEach((item) => {
+            document.getElementById(item.id).addEventListener('click',()=>{
+                arr = arr.filter( p => p.id !== item.id);
+                render();
+            });
+        });
+
+        //update
+        arr.forEach((item) => {
+            const editBtn = document.querySelector(`#edit${item.id}`)
+            .addEventListener('click', () => {
+                editId = item.id;
+                catchName = item.name;
+                render();
+            })
+        })
+        //after update
+        arr.forEach((item)=>{
+            const saved = document.querySelector(`#save${item.id}`)
+            if (saved) {
+                saved.addEventListener('click', () => {
+                    if (item.id === editId) {
+                        const input = document.querySelector(`#input${item.id}`)
+                        item.name = input.value;
+                        editId = ''
+                    }
+                    render();
+                })
+            }
+        })
+    }
+    render();
+    //add
+    addBtn.addEventListener('click', () => {
+        arr.push( {
+            id : self.crypto.randomUUID(),
+            name : self.crypto.randomUUID().substring(0,5)
+        });
+        render();
+    })
+
+</script>
+</body>
+</html>
